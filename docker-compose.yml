@@ -1,0 +1,33 @@
+version: '3.7'
+services:
+  flask-app:
+    build:
+      context: .
+      network: host
+      args:
+        pypi: http://localhost:3141/root/pypi/+simple/ 
+    image: kerma/flask-template-app
+    volumes:
+      - .:/code
+    ports:
+      - 8080:8080
+    environment:
+      - FLASK_APP=ftapp
+      - FLASK_RUN_PORT=8080
+      - FLASK_ENV=development
+      - DB_HOST=db
+      - DB_NAME=flask
+      - DB_USER=flask
+      - DB_PASSWORD=flask
+    restart: always
+    command: ["flask", "run", "--host", "0.0.0.0"]
+  db:
+    image: postgres:10.5-alpine
+    volumes: 
+      - ./pgdata:/var/lib/postgresql/data
+      - ./script/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password
+    ports:
+      - 5432:5432
